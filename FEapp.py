@@ -1,6 +1,14 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+
+# Ensure st.session_state['data'] is initialized as a DataFrame
+if 'data' not in st.session_state or not isinstance(st.session_state['data'], pd.DataFrame):
+    st.session_state['data'] = pd.DataFrame(columns=['Customer', 'Month', 'Consumption'])
+
+new_data = {'Customer': customer_name, 'Month': consumption_month, 'Consumption': consumption_amount}
+
+# Append new data ensuring DataFrame exists
+st.session_state['data'] = pd.concat([st.session_state['data'], pd.DataFrame([new_data])], ignore_index=True)
 
 # Title of the app
 st.title('Snowflake Consumption Tracker')
