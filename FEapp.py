@@ -13,13 +13,14 @@ with st.sidebar:
     consumption_month = st.date_input('Month', datetime.now()).strftime('%Y-%m')
     submit_button = st.button('Submit')
 
-# Placeholder for storing and displaying data
+# Initialize the DataFrame if it doesn't exist in the session state
 if 'data' not in st.session_state:
     st.session_state['data'] = pd.DataFrame(columns=['Customer', 'Month', 'Consumption'])
 
 # Handle the submit action
 if submit_button:
     new_data = {'Customer': customer_name, 'Month': consumption_month, 'Consumption': consumption_amount}
+    # Append the new data to the DataFrame
     st.session_state['data'] = st.session_state['data'].append(new_data, ignore_index=True)
 
 # Display the data
