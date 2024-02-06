@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import matplotlib.pyplot as plt
+import matplotlib as plt
 import seaborn as sns
 
 # Title of the app
