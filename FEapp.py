@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import plotly.express as px  # Import Plotly Express for visualization
 
 # Title of the app
 st.title('Snowflake Consumption Tracker')
@@ -28,10 +27,10 @@ if submit_button:
         customer_name = new_customer
     if customer_name:  # Ensure a customer name is provided
         new_data = {
-            'Customer': customer_name,
-            'Month': consumption_month,
-            'Consumption': consumption_amount,
-            'Project Status': project_status,
+            'Customer': customer_name, 
+            'Month': consumption_month, 
+            'Consumption': consumption_amount, 
+            'Project Status': project_status, 
             'Notes': notes,
             'Region': region
         }
@@ -68,8 +67,3 @@ if not filtered_data.empty:
     filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
     st.subheader('Month-over-Month Change (%)')
     st.dataframe(filtered_data)
-
-# Visualization with Plotly
-group_option = st.selectbox("Group Data By", ['Customer', 'Region', 'Project Status'])
-fig = px.line(filtered_data, x='Month', y='Consumption', color=group_option, title=f'Monthly Consumption by {group_option}')
-st.plotly_chart(fig)
