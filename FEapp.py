@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Title of the app
 st.title('Snowflake Consumption Tracker')
@@ -67,3 +68,31 @@ if not filtered_data.empty:
     filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
     st.subheader('Month-over-Month Change (%)')
     st.dataframe(filtered_data)
+
+# Visualization Section
+st.subheader('Consumption Growth by Customer')
+
+# Ensure there is data to plot
+if not st.session_state['data'].empty:
+    # Convert 'Month' to datetime and sort data for plotting
+    st.session_state['data']['Month'] = pd.to_datetime(st.session_state['data']['Month'])
+    plotting_data = st.session_state['data'].sort_values(['Customer', 'Month'])
+    
+    # Create a figure and axis for Matplotlib
+    fig, ax = plt.subplots()
+    
+    # Plot consumption for each customer
+    for customer in plotting_data['Customer'].unique():
+        customer_data = plotting_data[plotting_data['Customer'] == customer]
+        ax.plot(customer_data['Month'], customer_data['Consumption'], label=customer)
+    
+    # Set plot labels and legend
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Consumption ($)')
+    ax.set_title('Monthly Consumption Growth by Customer')
+    ax.legend()
+    
+    # Show the plot in Streamlit
+    st.pyplot(fig)
+else:
+    st.write("No data available for visualization.")
