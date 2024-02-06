@@ -1,44 +1,52 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
-# Initialize session state to store data
+# Title of the app
+st.title('Snowflake Consumption Tracker')
+
+# Initialize the DataFrame in session state if it doesn't exist
 if 'data' not in st.session_state:
-    st.session_state.data = pd.DataFrame(columns=[
-        "SI", "Customer", "Implementation colour code:Red/Yellow/Green", "Go Live Date",
-        "Last Month Consumption", "Projected Consumption Value", "Update / Client Feedback / Use Case",
-        "Snowflake Growth Plan", "Region"  # Add "Region" to the columns
-    ])
+    st.session_state['data'] = pd.DataFrame(columns=['Customer', 'Month', 'Consumption', 'Project Status', 'Notes', 'Region'])
 
-# Function to add a new customer record
-def add_customer(si, customer, status, go_live_date, last_month_consumption, projected_consumption_value, feedback, growth_plan, region):
-    new_entry = {
-        "SI": si,
-        "Customer": customer,
-        "Implementation colour code:Red/Yellow/Green": status,
-        "Go Live Date": go_live_date,
-        "Last Month Consumption": last_month_consumption,
-        "Projected Consumption Value": projected_consumption_value,
-        "Update / Client Feedback / Use Case": feedback,
-        "Snowflake Growth Plan": growth_plan,
-        "Region": region  # Add the "Region" value
-    }
-    st.session_state.data = st.session_state.data.append(new_entry, ignore_index=True)
-
-# Sidebar for data entry
+# Sidebar for user input
 with st.sidebar:
-    st.header("Enter Customer Data")
-    si = st.text_input("SI")
-    customer = st.text_input("Customer")
-    status = st.selectbox("Implementation Status", ["On Track", "Paused", "On Hold By Client", "Red", "Yellow", "Green"])
-    go_live_date = st.date_input("Go Live Date")
-    last_month_consumption = st.text_area("Last Month Consumption")
-    projected_consumption_value = st.text_input("Projected Consumption Value")
-    feedback = st.text_area("Update / Client Feedback / Use Case")
-    growth_plan = st.text_input("Snowflake Growth Plan")
-    # Dropdown for selecting the region
-    region = st.selectbox("Region", ["Canada East", "Canada Central", "Canada West", "US East", "US Central", "US West"])
-    add_data = st.button("Add Customer", on_click=add_customer, args=(si, customer, status, go_live_date, last_month_consumption, projected_consumption_value, feedback, growth_plan, region))
+    st.header('Add Customer Consumption')
+    # Input for the customer name
+    customer_name = st.selectbox('Customer Name', options=[''] + list(st.session_state['data']['Customer'].unique()))
+    new_customer = st.text_input('Or add new customer')
+    consumption_amount = st.number_input('Monthly Consumption Amount ($)', min_value=0.0, format='%f')
+    consumption_month = st.date_input('Month', datetime.now()).strftime('%Y-%m')
+    project_status = st.selectbox('Project Status', ['On Track', 'At Risk', 'Paused'])
+    notes = st.text_area('Notes')
+    region = st.selectbox('Region', ['Canada East', 'Canada Central', 'Canada West', 'US East', 'US Central', 'US West'])
+    submit_button = st.button('Submit')
+
+# Handle the submit action
+if submit_button:
+    if new_customer:  # If a new customer name is provided, use it
+        customer_name = new_customer
+    if customer_name:  # Ensure a customer name is provided
+        new_data = {
+            'Customer': customer_name, 
+            'Month': consumption_month, 
+            'Consumption': consumption_amount, 
+            'Project Status': project_status, 
+            'Notes': notes,
+            'Region': region  # Add the selected region to the new data entry
+        }
+        st.session_state['data'] = st.session_state['data'].append(new_data, ignore_index=True)
+    else:
+        st.error('Please provide a customer name.')
 
 # Display the data
-st.header("Customer Data")
-st.dataframe(st.session_state.data)
+st.subheader('Monthly Consumption Data')
+st.dataframe(st.session_state['data'])
+
+# Calculate and display month-over-month changes if possible
+if not st.session_state['data'].empty:
+    st.session_state['data']['Month'] = pd.to_datetime(st.session_state['data']['Month'])
+    st.session_state['data'].sort_values(['Customer', 'Month'], inplace=True)
+    st.session_state['data']['MoM Change'] = st.session_state['data'].groupby('Customer')['Consumption'].diff().fillna(0)
+    st.subheader('Month-over-Month Change')
+    st.dataframe(st.session_state['data'])
