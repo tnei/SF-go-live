@@ -61,6 +61,13 @@ st.dataframe(filtered_data)
 if not filtered_data.empty:
     filtered_data['Month'] = pd.to_datetime(filtered_data['Month'])
     filtered_data.sort_values(['Customer', 'Month'], inplace=True)
+    # Calculate MoM Change as a percentage
+    filtered_data['MoM Change'] = filtered_data.groupby('Customer')['Consumption'].pct_change().fillna(0) * 100
+    # Format the 'MoM Change' column to show percentages with 2 decimal places
+    filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
+    st.subheader('Month-over-Month Change (%)')
+    st.dataframe(filtered_data)
+    filtered_data.sort_values(['Customer', 'Month'], inplace=True)
     filtered_data['MoM Change'] = filtered_data.groupby('Customer')['Consumption'].diff().fillna(0)
     st.subheader('Month-over-Month Change')
     st.dataframe(filtered_data)
