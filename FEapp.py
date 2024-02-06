@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px  # Import Plotly Express
 
 # Title of the app
 st.title('Snowflake Consumption Tracker')
@@ -27,10 +30,10 @@ if submit_button:
         customer_name = new_customer
     if customer_name:  # Ensure a customer name is provided
         new_data = {
-            'Customer': customer_name, 
-            'Month': consumption_month, 
-            'Consumption': consumption_amount, 
-            'Project Status': project_status, 
+            'Customer': customer_name,
+            'Month': consumption_month,
+            'Consumption': consumption_amount,
+            'Project Status': project_status,
             'Notes': notes,
             'Region': region
         }
@@ -67,3 +70,12 @@ if not filtered_data.empty:
     filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
     st.subheader('Month-over-Month Change (%)')
     st.dataframe(filtered_data)
+
+# Visualizations with Plotly
+st.subheader("Interactive Consumption Trend by Customer")
+if not filtered_data.empty:
+    # Ensure 'Month' is in a proper format for Plotly
+    filtered_data['Month'] = pd.to_datetime(filtered_data['Month']).dt.strftime('%Y-%m')
+    fig = px.line(filtered_data, x='Month', y='Consumption', color='Customer', title='Monthly Consumption by Customer')
+    st.plotly_chart(fig)
+
