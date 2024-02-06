@@ -34,7 +34,7 @@ if submit_button:
             'Notes': notes,
             'Region': region
         }
-        st.session_state['data'] = st.session_state['data'].append(new_data, ignore_index=True)
+        st.session_state['data'] = pd.concat(st.session_state['data'], pd.DataFrame([new_data]), ignore_index=True)
     else:
         st.error('Please provide a customer name.')
 
