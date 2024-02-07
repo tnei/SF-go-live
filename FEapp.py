@@ -76,7 +76,7 @@ if not filtered_data.empty:
     filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
     
     with st.expander("Month-over-Month Change (%)"):
-        st.dataframe(filtered_data[['Customer', 'Month', 'MoM Change']]
+        st.dataframe(filtered_data[['Customer', 'Month', 'MoM Change']])
        
 # Function to display the main tracker page
 def main_tracker_page():
