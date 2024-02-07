@@ -84,3 +84,42 @@ if not filtered_data.empty:
     filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
     st.subheader('Month-over-Month Change (%)')
     st.dataframe(filtered_data)
+
+# Function to display the main tracker page
+def main_tracker_page():
+    st.title('Snowflake Consumption Tracker - Active Projects')
+    
+    # Sidebar for user input in Active Projects page
+    with st.sidebar:
+        st.header('Add Customer Consumption')
+        # Your existing sidebar code for adding customer consumption...
+
+    # Your existing code for handling submit action, filtering, and displaying data...
+    
+    # Button to move selected customers to completed
+    completed_customers = st.multiselect('Select customers to mark as Completed', options=st.session_state['data']['Customer'].unique())
+    if st.button('Mark as Completed'):
+        if 'completed_data' not in st.session_state:
+            st.session_state['completed_data'] = pd.DataFrame(columns=st.session_state['data'].columns)
+        for customer in completed_customers:
+            # Move selected customers to completed_data
+            completed_entries = st.session_state['data'][st.session_state['data']['Customer'] == customer]
+            st.session_state['completed_data'] = pd.concat([st.session_state['completed_data'], completed_entries])
+            st.session_state['data'] = st.session_state['data'][st.session_state['data']['Customer'] != customer]
+        st.success('Selected customers marked as Completed')
+
+# Function to display the completed projects page
+def completed_projects_page():
+    st.title('Completed Projects')
+    if 'completed_data' in st.session_state and not st.session_state['completed_data'].empty:
+        st.dataframe(st.session_state['completed_data'])
+    else:
+        st.write("No completed projects.")
+
+# Add a navigation bar
+page = st.sidebar.selectbox("Navigate", ["Active Projects", "Completed Projects"])
+
+if page == "Active Projects":
+    main_tracker_page()
+elif page == "Completed Projects":
+    completed_projects_page()
