@@ -4,7 +4,7 @@ from datetime import datetime, date
 
 # UI Customization and Theming
 st.set_page_config(
-   page_title="Snowflake Consumption Tracker",
+   page_title="Snowflake Go-Live Tracker",
    page_icon=":snowflake:",
    layout="wide",
    initial_sidebar_state="expanded",
