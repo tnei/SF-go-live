@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # Title of the app
-st.title('Snowflake Consumption Tracker')
+st.title('Snowflake Go-Live Tracker')
 
 # Initialize the DataFrame in session state if it doesn't exist
 if 'data' not in st.session_state:
