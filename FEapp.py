@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 
 # UI Customization and Theming
 st.set_page_config(
@@ -28,7 +28,7 @@ with st.sidebar:
     customer_name = st.selectbox('Customer Name', options=[''] + list(st.session_state['data']['Customer'].unique()))
     new_customer = st.text_input('Or add new customer')
     consumption_amount = st.number_input('Monthly Consumption Amount ($)', min_value=0.0, format='%f')
-    consumption_month = st.date_input('Month', datetime.now()).strftime('%Y-%m')
+    consumption_month = st.date_input('Month', datetime.now(), min_value=datetime(2000, 1, 1), max_value=date.today()).strftime('%Y-%m')
     project_status = st.selectbox('Project Status', ['On Track', 'At Risk', 'Paused'])
     notes = st.text_area('Notes')
     region = st.selectbox('Region', ['Canada East', 'Canada Central', 'Canada West', 'US East', 'US Central', 'US West'])
@@ -81,6 +81,11 @@ if filter_region != 'All':
 if filter_project_status != 'All':
     filtered_data = filtered_data[filtered_data['Project Status'] == filter_project_status]
 
+# Display "Total Consumption" and "Average Consumption" metrics
+if not filtered_data.empty:
+    st.metric("Total Consumption", f"${filtered_data['Consumption'].sum():,.2f}")
+    st.metric("Average Consumption", f"${filtered_data['Consumption'].mean():,.2f}")
+
 # Collapsible section for displaying filtered data
 with st.expander("Filtered Monthly Consumption Data", expanded=True):
     st.dataframe(filtered_data)
@@ -126,7 +131,7 @@ def completed_projects_page():
     else:
         st.write("No completed projects.")
 
-# Add a navigation bar
+# Add a navigation bar and function calls
 page = st.sidebar.selectbox("Navigate", ["Active Projects", "Completed Projects"])
 
 if page == "Active Projects":
