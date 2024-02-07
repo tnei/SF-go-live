@@ -38,6 +38,23 @@ if submit_button:
     else:
         st.error('Please provide a customer name.')
 
+# Assuming 'data' DataFrame is available and not empty
+if not st.session_state['data'].empty:
+    # Generate a unique identifier for each row to help users select entries to delete
+    st.session_state['data']['ID'] = st.session_state['data'].apply(lambda x: f"{x['Customer']} - {x['Month']}", axis=1)
+    
+    # Let users select entries to delete based on this ID
+    delete_selection = st.multiselect('Select entries to delete', options=st.session_state['data']['ID'].unique())
+    
+    # Button to delete selected entries
+    if st.button('Delete Selected Entries'):
+        # Keep rows that are not in delete_selection
+        st.session_state['data'] = st.session_state['data'][~st.session_state['data']['ID'].isin(delete_selection)]
+        st.success('Selected entries deleted.')
+
+    # Remove the 'ID' column before displaying or using the DataFrame further
+    st.session_state['data'] = st.session_state['data'].drop(columns=['ID'])
+
 # Filtering options
 st.sidebar.header("Filter Data")
 filter_customer = st.sidebar.selectbox('Filter by Customer', options=['All'] + list(st.session_state['data']['Customer'].unique()))
