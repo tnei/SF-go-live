@@ -25,8 +25,15 @@ if 'data' not in st.session_state:
 # Sidebar for user input
 with st.sidebar:
     st.header('Add Customer Consumption')
-    customer_name = st.selectbox('Customer Name', options=[''] + list(st.session_state['data']['Customer'].unique()))
-    new_customer = st.text_input('Or add new customer')
+    
+    # NEW CODE: Combine existing customers with a text input for new customers
+    existing_customers = list(st.session_state['data']['Customer'].unique())
+    customer_name = st.sidebar.text_input('Customer Name')
+    if customer_name:
+        existing_customers.append(customer_name)
+    customer_selection = st.sidebar.selectbox('Select or Add New Customer', options=existing_customers)
+    
+    # Continue with other inputs but adjust to use `customer_selection` instead of `customer_name`
     consumption_amount = st.number_input('Monthly Consumption Amount ($)', min_value=0.0, format='%f')
     consumption_month = st.date_input('Month', datetime.now()).strftime('%Y-%m')
     project_status = st.selectbox('Project Status', ['On Track', 'At Risk', 'Paused'])
@@ -34,22 +41,17 @@ with st.sidebar:
     region = st.selectbox('Region', ['Canada East', 'Canada Central', 'Canada West', 'US East', 'US Central', 'US West'])
     submit_button = st.button('Submit')
 
-# Handle the submit action
+# Modify the 'Handle the submit action' section to use `customer_selection` instead of `customer_name`
 if submit_button:
-    if new_customer:  # If a new customer name is provided, use it
-        customer_name = new_customer
-    if customer_name:  # Ensure a customer name is provided
-        new_data = {
-            'Customer': customer_name, 
-            'Month': consumption_month, 
-            'Consumption': consumption_amount, 
-            'Project Status': project_status, 
-            'Notes': notes,
-            'Region': region
-        }
-        st.session_state['data'] = pd.concat([st.session_state['data'], pd.DataFrame([new_data])], ignore_index=True)
-    else:
-        st.error('Please provide a customer name.')
+    new_data = {
+        'Customer': customer_selection,  # Use `customer_selection` here
+        'Month': consumption_month,
+        'Consumption': consumption_amount,
+        'Project Status': project_status,
+        'Notes': notes,
+        'Region': region
+    }
+    st.session_state['data'] = pd.concat([st.session_state['data'], pd.DataFrame([new_data])], ignore_index=True)
 
 # Assuming 'data' DataFrame is available and not empty
 if not st.session_state['data'].empty:
