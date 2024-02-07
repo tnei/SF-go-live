@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+consumption_month = st.sidebar.date_input('Month', datetime.now(), min_value=datetime(2000, 1, 1), max_value=date.today()).strftime('%Y-%m')
+
 # UI Customization and Theming
 st.set_page_config(
    page_title="Snowflake Consumption Tracker",
