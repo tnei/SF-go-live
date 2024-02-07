@@ -2,6 +2,19 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+# UI Customization and Theming
+st.set_page_config(
+   page_title="Snowflake Consumption Tracker",
+   page_icon=":snowflake:",
+   layout="wide",
+   initial_sidebar_state="expanded",
+   menu_items={
+       'Get Help': 'https://www.example.com',
+       'Report a bug': "https://www.example.com",
+       'About': "# This is a Snowflake Consumption Tracker. Built with Streamlit."
+   }
+)
+
 # Title of the app
 st.title('Snowflake Consumption Tracker')
 
