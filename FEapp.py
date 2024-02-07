@@ -51,6 +51,9 @@ if submit_button:
     else:
         st.error('Please provide a customer name.')
 
+# Apply filters to DataFrame
+filtered_data = st.session_state['data']
+
 # Assuming 'data' DataFrame is available and not empty
 if not st.session_state['data'].empty:
     # Generate a unique identifier for each row to help users select entries to delete
@@ -98,6 +101,20 @@ if not filtered_data.empty:
     st.subheader('Month-over-Month Change (%)')
     st.dataframe(filtered_data)
 
+# Collapsible section for displaying filtered data
+with st.expander("Filtered Monthly Consumption Data", expanded=True):
+    st.dataframe(filtered_data)
+
+# Collapsible section for displaying month-over-month changes
+if not filtered_data.empty:
+    filtered_data['Month'] = pd.to_datetime(filtered_data['Month'])
+    filtered_data.sort_values(['Customer', 'Month'], inplace=True)
+    filtered_data['MoM Change'] = filtered_data.groupby('Customer')['Consumption'].pct_change().fillna(0) * 100
+    filtered_data['MoM Change'] = filtered_data['MoM Change'].map('{:,.2f}%'.format)
+    
+    with st.expander("Month-over-Month Change (%)"):
+        st.dataframe(filtered_data[['Customer', 'Month', 'MoM Change']])
+       
 # Function to display the main tracker page
 def main_tracker_page():
     st.title('Snowflake Consumption Tracker - Active Projects')
