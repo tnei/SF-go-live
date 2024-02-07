@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from st_aggrid import AgGrid
 
 # UI Customization and Theming
 st.set_page_config(
@@ -81,35 +82,18 @@ if not filtered_data.empty:
 # Function to display the main tracker page
 def main_tracker_page():
     st.title('Snowflake Consumption Tracker - Active Projects')
-    
-    # Sidebar for user input in Active Projects page
-    with st.sidebar:
-        st.header('Add Customer Consumption')
-        # Your existing sidebar code for adding customer consumption...
+    # Assuming 'filtered_data' is prepared before this function is called
+    AgGrid(filtered_data)
 
-    # Your existing code for handling submit action, filtering, and displaying data...
-    
-    # Button to move selected customers to completed
-    completed_customers = st.multiselect('Select customers to mark as Completed', options=st.session_state['data']['Customer'].unique())
-    if st.button('Mark as Completed'):
-        if 'completed_data' not in st.session_state:
-            st.session_state['completed_data'] = pd.DataFrame(columns=st.session_state['data'].columns)
-        for customer in completed_customers:
-            # Move selected customers to completed_data
-            completed_entries = st.session_state['data'][st.session_state['data']['Customer'] == customer]
-            st.session_state['completed_data'] = pd.concat([st.session_state['completed_data'], completed_entries])
-            st.session_state['data'] = st.session_state['data'][st.session_state['data']['Customer'] != customer]
-        st.success('Selected customers marked as Completed')
-
-# Function to display the completed projects page
 def completed_projects_page():
     st.title('Completed Projects')
+    # Ensure 'completed_data' is available and not empty
     if 'completed_data' in st.session_state and not st.session_state['completed_data'].empty:
-        st.dataframe(st.session_state['completed_data'])
+        AgGrid(st.session_state['completed_data'])
     else:
         st.write("No completed projects.")
 
-# Add a navigation bar
+# Navigation and page logic, including sidebar configurations...
 page = st.sidebar.selectbox("Navigate", ["Active Projects", "Completed Projects"])
 
 if page == "Active Projects":
